@@ -4,3 +4,4 @@ psycopg2-binary==2.9.*
 django-cors-headers==4.*
 redis==5.*
 Pillow==11.*
+gunicorn==23.*
