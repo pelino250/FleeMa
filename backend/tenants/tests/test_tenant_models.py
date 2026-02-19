@@ -7,9 +7,8 @@ TenantAwareModel subclass inline so no extra migration is required.
 
 import pytest
 from django.db import connection, models
-from django.test import TestCase, TransactionTestCase
+from django.test import TransactionTestCase
 from django.test.utils import isolate_apps
-
 
 # ---------------------------------------------------------------------------
 # Helpers

@@ -4,7 +4,6 @@ Tests for authentication endpoints (#23, #24, #25, #26, #27).
 RED step: written before any views/serializers exist.
 """
 
-import pytest
 from django.conf import settings
 from django.test import TestCase
 from rest_framework import status
@@ -145,7 +144,7 @@ class TestLogin(TestCase):
 class TestLogout(TestCase):
     def setUp(self):
         self.client = make_client()
-        resp = register(self.client)
+        register(self.client)
         # Cookie is set from register
 
     def test_logout_returns_200(self):

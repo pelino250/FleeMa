@@ -5,6 +5,10 @@ DRF permission classes for FleeMa RBAC (#28).
   Superadmin > TenantAdmin > Manager > Employee > Driver
 """
 
+from __future__ import annotations
+
+from typing import ClassVar
+
 from rest_framework.permissions import BasePermission
 
 from authentication.models import Role
@@ -24,7 +28,7 @@ class IsSaaSAdmin(BasePermission):
 class IsTenantAdmin(BasePermission):
     """TenantAdmin or Superadmin."""
 
-    _allowed = {Role.TENANT_ADMIN, Role.SUPERADMIN}
+    _allowed: ClassVar[set] = {Role.TENANT_ADMIN, Role.SUPERADMIN}
 
     def has_permission(self, request, view) -> bool:
         return bool(
@@ -37,7 +41,7 @@ class IsTenantAdmin(BasePermission):
 class IsManagerOrTenantAdmin(BasePermission):
     """Manager, TenantAdmin, or Superadmin."""
 
-    _allowed = {Role.MANAGER, Role.TENANT_ADMIN, Role.SUPERADMIN}
+    _allowed: ClassVar[set] = {Role.MANAGER, Role.TENANT_ADMIN, Role.SUPERADMIN}
 
     def has_permission(self, request, view) -> bool:
         return bool(
@@ -61,7 +65,7 @@ class IsTenantMember(BasePermission):
 class CanApproveExpenses(BasePermission):
     """Managers and above can approve expenses."""
 
-    _allowed = {Role.MANAGER, Role.TENANT_ADMIN, Role.SUPERADMIN}
+    _allowed: ClassVar[set] = {Role.MANAGER, Role.TENANT_ADMIN, Role.SUPERADMIN}
 
     def has_permission(self, request, view) -> bool:
         return bool(
@@ -74,7 +78,7 @@ class CanApproveExpenses(BasePermission):
 class CanManageUsers(BasePermission):
     """Only TenantAdmin and Superadmin can manage users."""
 
-    _allowed = {Role.TENANT_ADMIN, Role.SUPERADMIN}
+    _allowed: ClassVar[set] = {Role.TENANT_ADMIN, Role.SUPERADMIN}
 
     def has_permission(self, request, view) -> bool:
         return bool(

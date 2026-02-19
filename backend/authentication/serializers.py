@@ -2,16 +2,17 @@
 Authentication serializers for register, login, and profile endpoints.
 """
 
-import re
+from __future__ import annotations
+
+from typing import ClassVar
 
 from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.utils.text import slugify
 from rest_framework import serializers
 
-from authentication.models import Role, User
+from authentication.models import User
 from tenants.models import Tenant
-
 
 # ---------------------------------------------------------------------------
 # Tenant serializer (nested response)
@@ -20,8 +21,8 @@ from tenants.models import Tenant
 class TenantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tenant
-        fields = ["id", "name", "subdomain", "email", "currency", "timezone", "is_active"]
-        read_only_fields = fields
+        fields: ClassVar[list[str]] = ["id", "name", "subdomain", "email", "currency", "timezone", "is_active"]
+        read_only_fields: ClassVar[list[str]] = fields
 
 
 # ---------------------------------------------------------------------------
@@ -33,11 +34,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = [
+        fields: ClassVar[list[str]] = [
             "id", "email", "first_name", "last_name", "phone",
             "role", "tenant", "date_joined",
         ]
-        read_only_fields = ["id", "email", "role", "tenant", "date_joined"]
+        read_only_fields: ClassVar[list[str]] = ["id", "email", "role", "tenant", "date_joined"]
 
 
 # ---------------------------------------------------------------------------

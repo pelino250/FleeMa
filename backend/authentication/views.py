@@ -1,9 +1,11 @@
-from django.shortcuts import render
-
 """
 Authentication views: register, login, logout, me, change-password.
 All using httpOnly cookie-based token authentication.
 """
+
+from __future__ import annotations
+
+from typing import ClassVar
 
 from django.conf import settings
 from django.db import transaction
@@ -22,7 +24,6 @@ from authentication.serializers import (
     UserProfileSerializer,
 )
 from tenants.models import Tenant
-
 
 # ---------------------------------------------------------------------------
 # Cookie helpers
@@ -50,7 +51,7 @@ def _clear_auth_cookie(response: Response) -> None:
 # ---------------------------------------------------------------------------
 
 class RegisterView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes: ClassVar[list] = [AllowAny]
 
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
@@ -91,7 +92,7 @@ class RegisterView(APIView):
 # ---------------------------------------------------------------------------
 
 class LoginView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes: ClassVar[list] = [AllowAny]
 
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
@@ -120,7 +121,7 @@ class LoginView(APIView):
 # ---------------------------------------------------------------------------
 
 class LogoutView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes: ClassVar[list] = [IsAuthenticated]
 
     def post(self, request):
         # Delete the server-side token
@@ -139,7 +140,7 @@ class LogoutView(APIView):
 # ---------------------------------------------------------------------------
 
 class MeView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes: ClassVar[list] = [IsAuthenticated]
 
     def get(self, request):
         serializer = UserProfileSerializer(request.user)
@@ -163,7 +164,7 @@ class MeView(APIView):
 # ---------------------------------------------------------------------------
 
 class ChangePasswordView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes: ClassVar[list] = [IsAuthenticated]
 
     def post(self, request):
         serializer = ChangePasswordSerializer(data=request.data)

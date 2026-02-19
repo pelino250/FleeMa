@@ -13,7 +13,6 @@ from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
 
-
 # ---------------------------------------------------------------------------
 # Tenant
 # ---------------------------------------------------------------------------
@@ -49,11 +48,11 @@ class Tenant(models.Model):
 # ---------------------------------------------------------------------------
 
 class TenantAwareQuerySet(models.QuerySet):
-    def for_tenant(self, tenant: Tenant) -> "TenantAwareQuerySet":
+    def for_tenant(self, tenant: Tenant) -> TenantAwareQuerySet:
         """Return only records belonging to *tenant*."""
         return self.filter(tenant=tenant)
 
-    def active(self) -> "TenantAwareQuerySet":
+    def active(self) -> TenantAwareQuerySet:
         """Exclude soft-deleted records (where deleted_at is set)."""
         return self.filter(deleted_at__isnull=True)
 

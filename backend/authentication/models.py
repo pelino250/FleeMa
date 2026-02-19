@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import ClassVar
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -25,7 +29,7 @@ class User(AbstractUser):
     phone = models.CharField(max_length=20, blank=True)
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["username"]
+    REQUIRED_FIELDS: ClassVar[list[str]] = ["username"]
 
     class Meta:
         db_table = "auth_user"

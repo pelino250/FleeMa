@@ -10,7 +10,6 @@ from rest_framework.test import APIRequestFactory
 from authentication.models import Role, User
 from tenants.models import Tenant
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
