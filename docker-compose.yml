@@ -3,16 +3,18 @@ services:
     build: .
     ports:
       - "8000:8000"
-    environment:
-    -
     depends_on:
-    -
+      - db
     volumes:
       - .:/app
 db:
-image: postgre:11-alpine
-ports:
-  - "5432:5432"
-environment:
-  -POSTGRE_DB=
-      
+image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=fleema
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    
