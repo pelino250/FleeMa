@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  web:
+    container_name: Docker.felix
+    build: .
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - DB_ENGINE=django.db.backends.postgresql
+      - DB_NAME=fleema_db
+      - DB_USER=fleema_user
+      - DB_PASSWORD=fleema_password
+      - DB_HOST=db
+      - DB_PORT=5432
+    depends_on:
+      - db
+    networks:
+      - Docker.felix
+
+  db:
+    container_name: Docker.felix-postgres
+    image: postgres:15-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=fleema_db
+      - POSTGRES_USER=fleema_user
+      - POSTGRES_PASSWORD=fleema_password
+    ports:
+      - "5432:5432"
+    networks:
+      - Docker.felix
+
+volumes:
+  postgres_data:
+
+networks:
+  Docker.felix:
+    driver: bridge
