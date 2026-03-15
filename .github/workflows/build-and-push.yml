@@ -135,7 +135,9 @@ jobs:
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/fleema-dev-key.pem
+          cat > ~/.ssh/fleema-dev-key.pem <<'EOF'
+          ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          EOF
           chmod 600 ~/.ssh/fleema-dev-key.pem
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
