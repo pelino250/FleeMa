@@ -96,14 +96,14 @@
           - name: "{{ docker_network }}"
         env:
           DJANGO_SECRET_KEY: "{{ django_secret_key | default(lookup('password', '/dev/null length=50 chars=ascii_letters,digits')) }}"
-          DJANGO_DEBUG: "{{ 'True' if environment == 'dev' else 'False' }}"
+          DJANGO_DEBUG: "{{ 'True' if app_environment == 'dev' else 'False' }}"
           DJANGO_ALLOWED_HOSTS: "*"
-          DB_HOST: "{{ db_host }}"
-          DB_PORT: "{{ db_port }}"
-          DB_NAME: "{{ db_name }}"
-          DB_USER: "{{ db_username }}"
-          DB_PASSWORD: "{{ db_password }}"
-          REDIS_URL: "redis://{{ redis_host }}:{{ redis_port }}/0"
+          POSTGRES_HOST: "{{ db_host }}"
+          POSTGRES_PORT: "{{ db_port | string }}"
+          POSTGRES_DB: "{{ db_name }}"
+          POSTGRES_USER: "{{ db_username }}"
+          POSTGRES_PASSWORD: "{{ db_password }}"
+          REDIS_URL: "redis://{{ redis_host }}:{{ redis_port | string }}/0"
         ports:
           - "8000:8000"
         healthcheck:
