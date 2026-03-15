@@ -216,7 +216,7 @@
 
     # ── Deployment Summary ─────────────────────
     - name: Get container status
-      command: docker ps --filter "name=fleema" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+      shell: docker ps --filter "name=fleema" --format "table {% raw %}{{.Names}}\t{{.Status}}\t{{.Ports}}{% endraw %}"
       register: container_status
       changed_when: false
 
