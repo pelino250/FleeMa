@@ -78,17 +78,29 @@ resource "aws_internet_gateway" "main" {
   }
 }
 
-# ── Public Subnet ────────────────────────────
-# Subnet with internet access (for EC2)
+# ── Public Subnets ───────────────────────────
+# Subnets with internet access (for EC2 and RDS)
+# RDS requires at least 2 subnets in different AZs
 
-resource "aws_subnet" "public" {
+resource "aws_subnet" "public_a" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = var.public_subnet_cidr
   availability_zone       = var.availability_zone
   map_public_ip_on_launch = true # Auto-assign public IP to instances
 
   tags = {
-    Name = "${var.project_name}-${var.environment}-public-subnet"
+    Name = "${var.project_name}-${var.environment}-public-subnet-a"
+  }
+}
+
+resource "aws_subnet" "public_b" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.2.0/24" # Second subnet in different AZ
+  availability_zone       = "${var.aws_region}b" # Different AZ
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-public-subnet-b"
   }
 }
 
@@ -108,9 +120,14 @@ resource "aws_route_table" "public" {
   }
 }
 
-# Associate route table with public subnet
-resource "aws_route_table_association" "public" {
-  subnet_id      = aws_subnet.public.id
+# Associate route table with public subnets
+resource "aws_route_table_association" "public_a" {
+  subnet_id      = aws_subnet.public_a.id
+  route_table_id = aws_route_table.public.id
+}
+
+resource "aws_route_table_association" "public_b" {
+  subnet_id      = aws_subnet.public_b.id
   route_table_id = aws_route_table.public.id
 }
 
@@ -249,7 +266,7 @@ resource "local_file" "private_key" {
 resource "aws_instance" "app" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.ec2_instance_type
-  subnet_id              = aws_subnet.public.id
+  subnet_id              = aws_subnet.public_a.id # Use first subnet for EC2
   vpc_security_group_ids = [aws_security_group.web.id]
   key_name               = aws_key_pair.deployer.key_name
 
@@ -291,11 +308,11 @@ resource "aws_instance" "app" {
 }
 
 # ── RDS Subnet Group ─────────────────────────
-# RDS requires subnet group (even for single subnet)
+# RDS requires at least 2 subnets in different AZs
 
 resource "aws_db_subnet_group" "main" {
   name       = "${var.project_name}-${var.environment}-db-subnet-group"
-  subnet_ids = [aws_subnet.public.id]
+  subnet_ids = [aws_subnet.public_a.id, aws_subnet.public_b.id]
 
   tags = {
     Name = "${var.project_name}-${var.environment}-db-subnet-group"
@@ -308,7 +325,7 @@ resource "aws_db_subnet_group" "main" {
 resource "aws_db_instance" "postgres" {
   identifier     = "${var.project_name}-${var.environment}-db"
   engine         = "postgres"
-  engine_version = var.db_engine_version
+  engine_version = "16" # Use major version only, AWS will use latest minor version
   instance_class = var.db_instance_class
 
   allocated_storage     = var.db_allocated_storage
@@ -324,7 +341,7 @@ resource "aws_db_instance" "postgres" {
   vpc_security_group_ids = [aws_security_group.rds.id]
   publicly_accessible    = false # Security: not accessible from internet
 
-  backup_retention_period = 7 # Keep backups for 7 days
+  backup_retention_period = 0 # 0 = no backups (free tier compatible, change to 1-7 for backups)
   backup_window           = "03:00-04:00" # UTC
   maintenance_window      = "mon:04:00-mon:05:00" # UTC
 
@@ -343,7 +360,7 @@ resource "aws_db_instance" "postgres" {
 
 resource "aws_elasticache_subnet_group" "main" {
   name       = "${var.project_name}-${var.environment}-redis-subnet-group"
-  subnet_ids = [aws_subnet.public.id]
+  subnet_ids = [aws_subnet.public_a.id, aws_subnet.public_b.id]
 
   tags = {
     Name = "${var.project_name}-${var.environment}-redis-subnet-group"

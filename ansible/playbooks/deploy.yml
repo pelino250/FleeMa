@@ -10,7 +10,6 @@
 - name: Deploy FleeMa Application
   hosts: fleema_app
   become: yes
-  become_user: "{{ app_user }}"
   vars_files:
     - ../vars.yml
 
@@ -123,10 +122,9 @@
         timeout: 60
 
     - name: Run database migrations
-      docker_container_exec:
-        container: "{{ backend_container }}"
-        command: python manage.py migrate --noinput
+      command: docker exec {{ backend_container }} python manage.py migrate --noinput
       register: migration_result
+      changed_when: "'No migrations to apply' not in migration_result.stdout"
 
     - name: Display migration output
       debug:

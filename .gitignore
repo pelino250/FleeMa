@@ -582,3 +582,16 @@ $RECYCLE.BIN/
 
 # Git worktrees
 .worktrees/
+
+# Terraform sensitive files
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/*.tfstate.backup
+terraform/.terraform.lock.hcl
+
+# Ansible sensitive files
+ansible/inventory.ini
+ansible/*.retry
+ansible/.vault_pass
+ansible/vault_pass.txt
