@@ -135,11 +135,12 @@ jobs:
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
-          cat > ~/.ssh/fleema-dev-key.pem <<'EOF'
-          ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          EOF
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/fleema-dev-key.pem
           chmod 600 ~/.ssh/fleema-dev-key.pem
-          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Add EC2 to known hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts 2>&1 || true
 
       - name: Create Ansible inventory from secrets
         run: |
